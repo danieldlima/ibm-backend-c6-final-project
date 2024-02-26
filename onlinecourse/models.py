@@ -1,4 +1,5 @@
 import sys
+from typing import TypedDict
 
 from django.utils.timezone import now
 try:
@@ -102,6 +103,14 @@ class Enrollment(models.Model):
             f'Course Mode: {self.mode} - '
             f'Rating: {self.rating}'
         )
+class Question(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    content = models.CharField(max_length=200)
+    grade = models.IntegerField(default=50)
+
+    def __str__(self):
+        return f'Question: {self.content}, Grade: {self.grade}'
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
