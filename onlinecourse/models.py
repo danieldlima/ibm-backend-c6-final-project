@@ -103,6 +103,15 @@ class Enrollment(models.Model):
             f'Course Mode: {self.mode} - '
             f'Rating: {self.rating}'
         )
+
+class ChoiceTypedDict(TypedDict):
+    content: str
+    is_correct: bool
+
+class AnswerResultDataTypedDict(TypedDict):
+    choice_answers: list[ChoiceTypedDict]
+    correct_answers: list[ChoiceTypedDict]
+
 class Question(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
@@ -120,6 +129,31 @@ class Question(models.Model):
             return True
 
         return False
+
+    def get_answer(self, selected_ids) -> AnswerResultDataTypedDict:
+        """
+        Retrieve the answer for the selected IDs.
+
+        Parameters:
+        - selected_ids: A list of selected IDs.
+
+        Returns:
+        A dictionary containing two lists:
+        - 'choice_answers': List of dictionaries with 'content' and 'is_correct' keys
+                            for all choices with is_correct=True.
+        - 'correct_answers': List of dictionaries with 'content' and 'is_correct' keys
+                             for choices with is_correct=True and ID in selected_ids.
+        """
+        return {
+            'choice_answers': [{
+                'content': choice.content,
+                'is_correct': choice.is_correct
+            } for choice in self.choice_set.filter(is_correct=True)],
+            'correct_answers': [{
+                'content': choice.content,
+                'is_correct': choice.is_correct
+            } for choice in self.choice_set.filter(is_correct=True, id__in=selected_ids)],
+        }
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
