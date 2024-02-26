@@ -1,4 +1,5 @@
 import sys
+
 from django.utils.timezone import now
 try:
     from django.db import models
@@ -94,6 +95,13 @@ class Enrollment(models.Model):
     mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     rating = models.FloatField(default=5.0)
 
+    def __str__(self):
+        return (
+            f'Enrollment: {self.course.name} - '
+            f'Course Name: {self.course.name} - '
+            f'Course Mode: {self.mode} - '
+            f'Rating: {self.rating}'
+        )
 
 # One enrollment could have multiple submission
 # One submission could have multiple choices
